@@ -1,0 +1,33 @@
+{
+  "name": "mrciles",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@discordjs/rest": "^2.5.1",
+    "@sparticuz/chromium": "^137.0.1",
+    "@sparticuz/chromium-min": "^137.0.1",
+    "adm-zip": "^0.5.16",
+    "app": "^0.1.0",
+    "axios": "^1.10.0",
+    "body-parser": "^2.2.0",
+    "cheerio": "^1.1.0",
+    "cors": "^2.8.5",
+    "discord-api-types": "^0.38.13",
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "firebase-admin": "^13.4.0",
+    "fs": "^0.0.1-security",
+    "node-fetch": "^2.7.0",
+    "partials": "^0.1.0",
+    "pg": "^8.16.2",
+    "playwright": "^1.53.1",
+    "puppeteer": "^24.11.0",
+    "puppeteer-core": "^24.11.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

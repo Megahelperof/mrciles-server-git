@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "helllo1",
+    "url": "https://sale.dhgate.com/yTMOY118",
+    "priceSelector": "b[class^='productPrice_price']",
+    "stockSelector": "button[class*='productButton_soldout']",
+    "checkText": "Sold Out"
+  },
+  {
+    "id": 2,
+    "name": "hello2",
+    "url": "https://sale.dhgate.com/F3zcNF87",
+    "priceSelector": "b[class^='productPrice_price']",
+    "stockSelector": "button[class*='productButton_soldout']",
+    "checkText": "Sold Out"
+  },
+  {
+    "id": 3,
+    "name": "hello32",
+    "url": "https://sale.dhgate.com/JHhD1g77",
+    "priceSelector": "b[class^='productPrice_price']",
+    "stockSelector": "button[class*='productButton_soldout']",
+    "checkText": "Sold Out"
+  }
+]
