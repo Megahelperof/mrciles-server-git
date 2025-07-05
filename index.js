@@ -319,7 +319,8 @@ if (!interaction.deferred && !interaction.replied) {
                     attachment, 
                     name, 
                     price, 
-                    link 
+                    link,
+                    timestamp: Date.now()
                 });
                 break;
             }
@@ -447,6 +448,9 @@ client.on('interactionCreate', async interaction => {
             if (!cachedData) {
                 return interaction.editReply('❌ Product data expired. Please try the command again.');
             }
+            cachedData.mainCategory = mainCategory;
+            cachedData.timestamp = Date.now();
+            productDataCache.set(interaction.message.id, cachedData); // Update cache
             
             if (CATEGORIES[mainCategory] && CATEGORIES[mainCategory].length > 0) {
                 const subCategoryRow = new ActionRowBuilder().addComponents(
