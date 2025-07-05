@@ -481,21 +481,31 @@ client.on('interactionCreate', async interaction => {
         }
         
         // Handle subcategory selection
-        else if (interaction.customId === 'sub_category') {
-            const subCategory = interaction.values[0];
-            const cachedData = productDataCache.get(interaction.message.id);
-            if (!cachedData || !cachedData.mainCategory) {
-                return interaction.editReply('❌ Product data expired. Please try the command again.');
-            }
-            
-            const { attachment, name, price, link, mainCategory } = cachedData;
-            const productId = await addProduct(attachment, name, price, link, mainCategory, subCategory);
-            productDataCache.delete(interaction.message.id);
-            await interaction.editReply({
-                content: `✅ Added product: "${name}" (ID: ${productId})\nCategory: **${mainCategory} > ${subCategory}**`,
-                components: []
-            });
-        }
+// Handle subcategory selection
+else if (interaction.customId === 'sub_category') {
+    // Get original message ID that started the flow
+    const originalMessageId = interaction.message.reference?.messageId;
+    if (!originalMessageId) {
+        return interaction.editReply('❌ Unable to locate original product data. Please restart the command.');
+    }
+
+    const cachedData = productDataCache.get(originalMessageId);
+    if (!cachedData || !cachedData.mainCategory) {
+        return interaction.editReply('❌ Product data expired. Please try the command again.');
+    }
+    
+    const subCategory = interaction.values[0];
+    const { attachment, name, price, link, mainCategory } = cachedData;
+    const productId = await addProduct(attachment, name, price, link, mainCategory, subCategory);
+    
+    // Clean up using the ORIGINAL message ID
+    productDataCache.delete(originalMessageId);
+    
+    await interaction.editReply({
+        content: `✅ Added product: "${name}" (ID: ${productId})\nCategory: **${mainCategory} > ${subCategory}**`,
+        components: []
+    });
+}
         
         // Handle bulk main category selection
         else if (interaction.customId === 'bulk_main_category') {
