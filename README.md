@@ -1,76 +1,110 @@
-# 🛍️ Mrciles E-Commerce Website
 
-Welcome to your custom website! This website has been specifically designed and developed for Mrciles to showcase and sell products online with a replicated looks of his previous site
+# 🤖 Mrciles Backend Discord Bot System
 
-## 🌟 What You're Getting
+Welcome to your custom backend system! This Discord bot provides two specialized services for managing your e-commerce operations through Discord commands.
 
-This is a complete, ready-to-use e-commerce website that includes:
-- **Product Display System** - Beautifully organized product galleries
-- **Category Management** - Products organized by different categories
-- **Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
-- **Database Integration** - Secure cloud-based product management
-- **Professional Layout** - Clean, modern design that builds customer trust
-- **Private Page** - A customized page system for only a specified/password system to be accessed
+## 🌟 Bot Capabilities
 
-## 📋 Getting Started
+### 1. **Firebase Bot**
+- **Product Catalog Management** - Add/remove products via Discord commands
+- **Image Processing** - Handles product image uploads and storage
+- **Category Organization** - Organizes products into categories/subcategories
+- **Bulk Operations** - Add/remove multiple products at once
+- **Firebase Integration** - Direct connection to your Firebase database
 
-### Step 1: Download Your Website
-1. Click [here to download your website files](https://github.com/Megahelperof/mrciles-server-git/archive/refs/heads/main.zip)
-2. Extract the ZIP file to a folder on your computer
+### 2. **Scraper Bot**
+- **Price Monitoring** - Tracks prices across multiple websites
+- **Stock Availability** - Checks real-time product availability
+- **Price Comparison** - Finds products closest to target prices
+- **Bulk Operations** - Add/remove multiple products at once
+- **Error Reporting** - Identifies products with monitoring issues
 
-### Step 2: Install Development Tools
-1. Download and install [Visual Studio Code](https://code.visualstudio.com/) (free code editor)
-2. Open the extracted folder in Visual Studio Code
+## 📋 Deployment Instructions
 
-### Step 3: Set Up the Website
-1. Open the terminal in Visual Studio Code
-2. Run the following command to install required components:
+### Step 1: Prepare Your Environment
+1. Create a new repository for your backend code
+2. Add these files to your repository:
+   - `index.js` (the main bot file)
+   - `package.json` (with required dependencies)
+   - `render.yaml` (deployment configuration)
+
+
+### Step 2: Required Environment Variables
+
+#### For Firebase Bot:
+```env
+BOT_TYPE=FIREBASE_BOT
+DISCORD_BOT_TOKEN=your_bot_token
+FIREBASE_SERVICE_ACCOUNT=base64_encoded_service_account
+ADMIN_ROLE_ID=your_admin_role_id
+```
+
+#### For Scraper Bot:
+```env
+BOT_TYPE=SCRAPER_BOT
+DISCORD_BOT_TOKEN=your_bot_token
+DISCORD_CLIENT_ID=your_client_id
+DISCORD_GUILD_ID=your_server_id
+```
+
+### Step 3: Generate Firebase Credentials
+1. Generate your Firebase service account JSON file
+2. Encode it in Base64:
+   ```bash
+   base64 -i serviceAccount.json > encoded.txt
    ```
-   npm install
-   ```
-3. **Important**: Contact **cbam on Discord** to receive your secure configuration files (.env and Firebase service files) - these contain sensitive information and cannot be shared publicly on GitHub
+3. Use the content of `encoded.txt` as `FIREBASE_SERVICE_ACCOUNT` value
 
-## 🎯 How Your Website Works
+### Step 4: Deploy to Render
+1. Connect your GitHub repository to Render
+2. Select the repository containing your bot code
+3. Render will automatically detect `render.yaml`
+4. Confirm deployment
 
-### Main Product Display
-Your homepage features a dynamic product grid that automatically loads and displays all your products in an attractive layout. The system pulls product information from your secure database and presents it beautifully to your customers.
+## 🎯 Bot Command Reference
 
-### Category Pages
-The website includes specialized category pages (like `/category/misc.html`) that automatically filter and display products based on their category. For example:
-- **MISC category** shows miscellaneous items
-- **Other categories** can be easily added as your inventory grows
+### Firebase Bot Commands:
+```
+/add - Add new product with image
+/remove [id] - Remove product by ID
+/bulk-add - Add multiple products via ZIP
+/help - Show available commands
+```
 
-### Product Information Structure
-Each product in your database contains:
-- **Product Name** (e.g., "Pokemon Plushies (Multiple Pokemons)")
-- **Price** (e.g., "$2.66")
-- **Category** (e.g., "MISC")
-- **Product Images** (high-quality AVIF format for fast loading)
-- **Purchase Links** (direct links to where customers can buy)
+### Scraper Bot Commands:
+```
+/products - Check product status
+/invalid - Show products with errors
+/prices [target] - Find products near target price
+/addlink [name] [url] - Add new product to monitor
+/removelink [id] - Remove product by ID
+/bulklink - Bulk import from JSON
+/bulkremovelink - Remove multiple products
+```
 
-## 🔧 Technical Features
+## 🔧 Technical Requirements
+- Node.js v18+
+- Render Web Service
+- Firebase Project (for Firebase Bot)
+- Discord Developer Application
 
-- **Cloud Database**: Your products are stored securely in Google Firebase
-- **Fast Loading**: Optimized images and code for quick page loads
-- **Mobile Friendly**: Looks great on all devices
-- **Easy Updates**: Product information can be updated through the database
-- **Secure**: All sensitive configuration files are kept private
+## ⚠️ Important Notes
+1. Keep all environment variables SECURE
+2. The Firebase Bot requires admin privileges
+3. Use different bots for different environments
+4. Contact cbam on Discord for Firebase setup assistance
+5. The system automatically cleans up old data every 5 minutes
 
 ## 📞 Support & Maintenance
+For assistance with:
+- Firebase configuration
+- Discord bot permissions
+- Deployment issues
+- Custom feature requests
 
-For any questions, updates, or technical support:
-- **Contact**: cbam on Discord
-- **Updates**: New products and categories can be added through the database or the Discord bot
-- **Modifications**: Custom changes and improvements available upon request if in the specified deal where a new feature can not surpass the previously requested feature or it will come with a payment for the additional feature
-
-## 🚀 Next Steps
-
-1. Complete the setup process above
-2. Contact cbam for your configuration files
-3. Review your product categories and organization
-4. Test the website thoroughly
-5. Launch your online store!
+Contact: **cbam on Discord**
 
 ---
 
-*This website has been custom-built for Mrciles with features and ongoing support. Thank you for choosing our services!*
+*This backend system has been custom-built for Mrciles with specialized e-commerce functionality. Thank you for choosing our services!*
+```
