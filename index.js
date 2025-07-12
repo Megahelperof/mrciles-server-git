@@ -179,8 +179,8 @@ const CATEGORIES = {
                 name,
                 price,
                 link,
-                mainCategory,  // Added category fields
-                subCategory,   // Added category fields
+                mainCategory,  
+                subCategory,   
                 created_at: admin.firestore.FieldValue.serverTimestamp()
             });
             return docRef.id;
@@ -207,7 +207,6 @@ async function bulkAddProducts(products) {
         for (const product of products) {
             const docRef = db.collection('products').doc();
             
-            // Create clean document data
             const docData = {
                 name: product.name,
                 price: product.price,
@@ -217,7 +216,6 @@ async function bulkAddProducts(products) {
                 created_at: admin.firestore.FieldValue.serverTimestamp()
             };
             
-            // Only add subCategory if it exists
             if (product.subCategory) {
                 docData.subCategory = product.subCategory;
             }
@@ -237,8 +235,7 @@ async function bulkAddProducts(products) {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
     const { commandName, options, member } = interaction;
-    
-    // Handle help command separately
+
     if (commandName === "help") {
         const helpEmbed = new EmbedBuilder()
             .setTitle('🔥 Firebase Bot Commands')
@@ -247,14 +244,12 @@ client.on('interactionCreate', async interaction => {
             .addFields(
                 { name: '/add', value: 'Add a new product with image, name, price and link' },
                 { name: '/remove [id]', value: 'Remove a product by ID' },
-                // Updated description here:
                 { name: '/bulk-add', value: 'Add multiple products at once (up to 10) via ZIP file' }
             );
         
     return interaction.reply({ embeds: [helpEmbed], flags: 64 });
     }
     
-    // Admin-only commands below
 if (!member.roles.cache.has(process.env.ADMIN_ROLE_ID)) {
     return interaction.reply({ 
         content: '⛔ You need admin privileges to use this command', 
@@ -262,12 +257,10 @@ if (!member.roles.cache.has(process.env.ADMIN_ROLE_ID)) {
     });
 }
 
-// Only defer if not already deferred/replied
 if (!interaction.deferred && !interaction.replied) {
     try {
         await interaction.deferReply({ flags: 64 });
     } catch (error) {
-        // Handle specific Discord API errors
         if (error.code === 10062 || error.code === 'InteractionAlreadyReplied') {
             console.log('Skipping already handled interaction');
             return;
@@ -285,7 +278,6 @@ if (!interaction.deferred && !interaction.replied) {
                 const price = options.getString('price');
                 const link = options.getString('link');
                 
-                // Validate attachment
                 if (!attachment || !attachment.contentType || !attachment.contentType.startsWith('image/')) {
                     await interaction.editReply('❌ Please attach a valid image file');
                     return;
@@ -295,7 +287,6 @@ if (!interaction.deferred && !interaction.replied) {
                     return;
                 }
                 
-                // Create category selection menu
                 const mainCategoryRow = new ActionRowBuilder().addComponents(
                     new StringSelectMenuBuilder()
                         .setCustomId('main_category')
@@ -308,13 +299,11 @@ if (!interaction.deferred && !interaction.replied) {
                         )
                 );
                 
-                // Send the category selection message
                 const message = await interaction.editReply({
                     content: '✅ Product details received! Please select a category:',
                     components: [mainCategoryRow]
                 });
                 
-                // Store product data in cache using message ID
                 productDataCache.set(message.id, { 
                     attachment, 
                     name, 
@@ -332,13 +321,11 @@ case 'bulk-add': {
     const prices = options.getString('prices').split(',').map(p => p.trim());
     const links = options.getString('links').split(',').map(l => l.trim());
 
-    // Validate ZIP file
     if (!zipAttachment || zipAttachment.contentType !== 'application/zip') {
         await interaction.editReply('❌ Please attach a valid ZIP file');
         return;
     }
 
-    // Validate input lengths
     if (names.length !== prices.length || names.length !== links.length) {
         await interaction.editReply('❌ Number of names, prices, and links must match');
         return;
@@ -350,14 +337,12 @@ case 'bulk-add': {
     }
 
     try {
-        // Download and process ZIP
         const response = await fetch(zipAttachment.url);
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const zip = new AdmZip(buffer);
         const zipEntries = zip.getEntries();
         
-        // Filter for image files
 const imageEntries = zipEntries.filter(entry => 
     !entry.isDirectory && /\.(jpg|jpeg|png|gif|webp|avif)$/i.test(entry.entryName)
 );
@@ -367,7 +352,6 @@ const imageEntries = zipEntries.filter(entry =>
             return;
         }
 
-        // Process products
         const bulkProducts = [];
         for (let i = 0; i < names.length; i++) {
             const imageData = imageEntries[i].getData();
@@ -385,12 +369,10 @@ const imageEntries = zipEntries.filter(entry =>
             });
         }
 
-        // Create preview text
         const previewText = names.map((name, i) => 
             `**${i+1}.** ${name} - ${prices[i]} - ${links[i]}`
         ).join('\n');
 
-        // Category selection
         const mainCategoryRow = new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
                 .setCustomId('bulk_main_category')
@@ -430,7 +412,6 @@ const imageEntries = zipEntries.filter(entry =>
 client.on('interactionCreate', async interaction => {
     if (!interaction.isStringSelectMenu() && !interaction.isButton()) return;
     
-    // Skip if already handled
     if (handledInteractions.has(interaction.id)) {
         console.log('Skipping already handled interaction:', interaction.id);
         return;
@@ -438,10 +419,8 @@ client.on('interactionCreate', async interaction => {
     handledInteractions.add(interaction.id);
 
     try {
-        // Safely defer interaction
         await safeDeferUpdate(interaction);
 
-        // Handle main category selection
         if (interaction.customId === 'main_category') {
             const mainCategory = interaction.values[0];
             const cachedData = productDataCache.get(interaction.message.id);
@@ -450,7 +429,7 @@ client.on('interactionCreate', async interaction => {
             }
             cachedData.mainCategory = mainCategory;
             cachedData.timestamp = Date.now();
-            productDataCache.set(interaction.message.id, cachedData); // Update cache
+            productDataCache.set(interaction.message.id, cachedData); 
             
             if (CATEGORIES[mainCategory] && CATEGORIES[mainCategory].length > 0) {
                 const subCategoryRow = new ActionRowBuilder().addComponents(
@@ -480,10 +459,7 @@ client.on('interactionCreate', async interaction => {
             }
         }
         
-        // Handle subcategory selection
-// Handle subcategory selection
 else if (interaction.customId === 'sub_category') {
-    // Get original message ID that started the flow
     const originalMessageId = interaction.message.reference?.messageId;
     if (!originalMessageId) {
         return interaction.editReply('❌ Unable to locate original product data. Please restart the command.');
@@ -498,7 +474,6 @@ else if (interaction.customId === 'sub_category') {
     const { attachment, name, price, link, mainCategory } = cachedData;
     const productId = await addProduct(attachment, name, price, link, mainCategory, subCategory);
     
-    // Clean up using the ORIGINAL message ID
     productDataCache.delete(originalMessageId);
     
     await interaction.editReply({
@@ -507,7 +482,6 @@ else if (interaction.customId === 'sub_category') {
     });
 }
         
-        // Handle bulk main category selection
         else if (interaction.customId === 'bulk_main_category') {
             const cached = bulkProductCache.get(interaction.message.id);
             if (!cached || Date.now() - cached.timestamp > 300000) {
@@ -571,7 +545,6 @@ else if (interaction.customId === 'sub_category') {
             }
         }
         
-        // Handle bulk subcategory selection
         else if (interaction.customId === 'bulk_sub_category') {
             const cached = bulkProductCache.get(interaction.message.id);
             if (!cached || !cached.products || Date.now() - cached.timestamp > 300000) {
@@ -602,7 +575,6 @@ else if (interaction.customId === 'sub_category') {
             });
         }
         
-        // Handle bulk add confirmation
         else if (interaction.customId === 'confirm_bulk_add') {
             const cached = bulkProductCache.get(interaction.message.id);
             if (!cached || !cached.products) {
@@ -629,7 +601,6 @@ else if (interaction.customId === 'sub_category') {
             });
         }
         
-        // Handle bulk add cancellation
         else if (interaction.customId === 'cancel_bulk_add') {
             bulkProductCache.delete(interaction.message.id);
             await interaction.editReply({
@@ -677,7 +648,7 @@ else if (interaction.customId === 'sub_category') {
     let products = [];
     let lastScrapeResults = [];
     let scrapeCacheTimestamp = 0;
-    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+    const CACHE_DURATION = 5 * 60 * 1000;
     
     try {
         if (fs.existsSync(PRODUCTS_FILE)) {
@@ -1004,7 +975,6 @@ else if (interaction.customId === 'sub_category') {
                     return interaction.reply({ embeds: [helpEmbed], flags: 64 });
                 }
                 
-                // Defer reply for all other commands
                 if (!interaction.replied && !interaction.deferred) {
                     await interaction.deferReply();
                 }

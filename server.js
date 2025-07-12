@@ -8,7 +8,6 @@ app.use(cors({
   methods: ['GET', 'POST']
 }));
 
-// Initialize Firebase with Render-friendly config
 if (!admin.apps.length) {
   try {
     const serviceAccount = JSON.parse(
@@ -28,12 +27,10 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// Serve static files
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 
-// API endpoint for products
 app.get('/api/products', async (req, res) => {
   try {
     const productsRef = db.collection('products');
@@ -43,7 +40,6 @@ app.get('/api/products', async (req, res) => {
     snapshot.forEach(doc => {
       const data = doc.data();
       
-      // Convert base64 images to data URLs
       if (data.image && data.image.data) {
         data.imageSrc = `data:${data.image.contentType};base64,${data.image.data}`;
       }
@@ -57,14 +53,13 @@ app.get('/api/products', async (req, res) => {
     
     res.json(products);
   } catch (err) {
-    // ... error handling ...
+
   }
 });
 app.post('/api/products/bulk', async (req, res) => {
   try {
     const { products } = req.body;
     
-    // Validate input data
     if (!products || !Array.isArray(products)) {
       return res.status(400).json({ 
         error: 'Invalid request format: products array is required' 
@@ -83,7 +78,7 @@ app.post('/api/products/bulk', async (req, res) => {
     let validCount = 0;
 
     for (const product of products) {
-      // Validate product structure
+
       if (!product.name || !product.price || !product.link || !product.image) {
         console.warn('Skipping invalid product:', product);
         continue;
@@ -92,7 +87,6 @@ app.post('/api/products/bulk', async (req, res) => {
       try {
         const docRef = productsRef.doc();
         
-        // Create product data
         const productData = {
           name: product.name,
           price: product.price,
@@ -115,7 +109,6 @@ app.post('/api/products/bulk', async (req, res) => {
       }
     }
 
-    // Commit the batch if we have valid products
     if (validCount > 0) {
       await batch.commit();
       console.log(`Successfully added ${validCount} products`);
@@ -140,7 +133,6 @@ app.post('/api/products/bulk', async (req, res) => {
     });
   }
 });
-// HTML route
 app.get('*', (req, res) => {
   res.sendFile('index.html', { root: 'public' });
 });
