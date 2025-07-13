@@ -402,7 +402,17 @@ const imageEntries = zipEntries.filter(entry =>
     }
     break;
 }
-
+    case 'remove': {
+        const id = options.getString('id');
+        try {
+            await removeProduct(id);
+            await interaction.editReply(`✅ Removed product with ID: ${id}`);
+        } catch (error) {
+            console.error('Remove error:', error);
+            await interaction.editReply(`❌ Failed to remove product: ${error.message}`);
+        }
+        break;
+    }
         }
     } catch (error) {
         console.error('Command error:', error);
