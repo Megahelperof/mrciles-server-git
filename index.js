@@ -29,7 +29,8 @@ async function safeDeferUpdate(interaction) {
     try {
         await interaction.deferUpdate();
     } catch (error) {
-        if (error.code === 10062 || error.code === 'InteractionAlreadyReplied') {
+        // Add 40060 error code to handled errors
+        if (error.code === 10062 || error.code === 40060 || error.code === 'InteractionAlreadyReplied') {
             console.log('Skipping already handled interaction');
             return;
         }
@@ -412,6 +413,7 @@ const imageEntries = zipEntries.filter(entry =>
 client.on('interactionCreate', async interaction => {
     if (!interaction.isStringSelectMenu() && !interaction.isButton()) return;
     
+    // Prevent duplicate processing
     if (handledInteractions.has(interaction.id)) {
         console.log('Skipping already handled interaction:', interaction.id);
         return;
@@ -611,10 +613,20 @@ else if (interaction.customId === 'sub_category') {
         }
     } catch (error) {
         console.error('Interaction error:', error);
-        if (interaction.deferred) {
-            await interaction.editReply(`❌ Error: ${error.message}`);
-        } else {
-            await interaction.reply({ content: `❌ Error: ${error.message}`, ephemeral: true });
+        try {
+            if (interaction.deferred || interaction.replied) {
+                await interaction.followUp({ 
+                    content: `❌ Error: ${error.message}`,
+                    ephemeral: true 
+                });
+            } else {
+                await interaction.reply({ 
+                    content: `❌ Error: ${error.message}`,
+                    ephemeral: true 
+                });
+            }
+        } catch (followUpError) {
+            console.error('Failed to send error:', followUpError);
         }
     }
 });
