@@ -402,17 +402,27 @@ const imageEntries = zipEntries.filter(entry =>
     }
     break;
 }
-    case 'remove': {
-        const id = options.getString('id');
-        try {
-            await removeProduct(id);
+case 'remove': {
+    const id = options.getString('id');
+    try {
+        await removeProduct(id);
+        // Add this check before responding
+        if (!interaction.replied && !interaction.deferred) {
             await interaction.editReply(`✅ Removed product with ID: ${id}`);
-        } catch (error) {
-            console.error('Remove error:', error);
-            await interaction.editReply(`❌ Failed to remove product: ${error.message}`);
+        } else {
+            await interaction.followUp(`✅ Removed product with ID: ${id}`);
         }
-        break;
+    } catch (error) {
+        console.error('Remove error:', error);
+        // Add this check before responding
+        if (!interaction.replied && !interaction.deferred) {
+            await interaction.editReply(`❌ Failed to remove product: ${error.message}`);
+        } else {
+            await interaction.followUp(`❌ Failed to remove product: ${error.message}`);
+        }
     }
+    break;
+}
         }
     } catch (error) {
         console.error('Command error:', error);
